@@ -15,6 +15,16 @@
         android:gravity="center"
         android:text="Map" />
 
+    <Button
+        android:id="@+id/navigation_btn"
+        android:layout_below="@id/map_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="Navigate" />
+
     <FrameLayout
         android:id="@+id/map_fragment"
         android:layout_width="match_parent"

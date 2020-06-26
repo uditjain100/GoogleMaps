@@ -14,5 +14,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, LocationActivity::class.java))
         }
 
+        navigation_btn.setOnClickListener {
+            startActivity(Intent(this, NavigationActivity::class.java))
+        }
+
     }
 }

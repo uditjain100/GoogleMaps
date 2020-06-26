@@ -58,19 +58,6 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback {
             geoLocate()
         }
 
-//        search_input.setOnEditorActionListener { _, actionId, event ->
-//            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-//                actionId == EditorInfo.IME_ACTION_DONE ||
-//                event!!.action == KeyEvent.ACTION_DOWN ||
-//                event.action == KeyEvent.KEYCODE_ENTER
-//            ) {
-//                Log.d("Ceased Meteor", "geoLocation is ON")
-//                geoLocate()
-//            }
-//            Log.d("Ceased Meteor", "geoLocation is OFF")
-//            false
-//        }
-
     }
 
     private fun geoLocate() {
@@ -86,7 +73,6 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback {
             var address = list[0]
             moveCamera(address.latitude, address.longitude)
         }
-
     }
 
     private fun moveCamera(latitude: Double, longitude: Double) {
