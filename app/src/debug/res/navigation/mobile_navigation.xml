@@ -22,4 +22,5 @@
         android:name="udit.programmer.co.mapswork.ui.Notification"
         android:label="Notification"
         tools:layout="@layout/fragment_notification" />
+
 </navigation>

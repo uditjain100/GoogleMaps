@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Gallery
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -19,12 +18,10 @@ import udit.programmer.co.mapswork.ui.Dashboard
 import udit.programmer.co.mapswork.ui.Home
 import udit.programmer.co.mapswork.ui.Notification
 
-class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener
-    , BottomNavigationView.OnNavigationItemReselectedListener {
+class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration1: AppBarConfiguration
     private lateinit var appBarConfiguration2: AppBarConfiguration
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,21 +73,5 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         return true
     }
 
-    override fun onNavigationItemReselected(it: MenuItem) {
-        when (it.itemId) {
-            R.id.nav_home -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.nav_host_fragment, Home())
-            }
-            R.id.nav_dashboard -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.nav_host_fragment, Dashboard())
-            }
-            R.id.nav_notifications -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.nav_host_fragment, Notification())
-            }
-        }
-    }
 
 }
