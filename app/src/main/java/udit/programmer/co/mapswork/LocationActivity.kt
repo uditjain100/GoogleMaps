@@ -61,16 +61,16 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun geoLocate() {
-        var searchString = search_input.text.toString()
-        var geocoder = Geocoder(this)
-        var list = mutableListOf<Address>()
+        val searchString = search_input.text.toString()
+        val geocoder = Geocoder(this)
+        val list = mutableListOf<Address>()
         try {
             list.addAll(geocoder.getFromLocationName(searchString, 1))
         } catch (e: Exception) {
             e.printStackTrace()
         }
         if (list.size > 0) {
-            var address = list[0]
+            val address = list[0]
             moveCamera(address.latitude, address.longitude)
         }
     }

@@ -10,6 +10,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        map_box_btn.setOnClickListener {
+            startActivity(Intent(this, MapBoxActivity::class.java))
+        }
+
         table_btn.setOnClickListener {
             startActivity(Intent(this, TableActivity::class.java))
         }

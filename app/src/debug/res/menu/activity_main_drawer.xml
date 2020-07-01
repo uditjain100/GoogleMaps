@@ -16,5 +16,9 @@
             android:id="@+id/nav_notifications"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Notification" />
+        <item
+            android:id="@+id/nav_blank"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Blank" />
     </group>
 </menu>
