@@ -45,6 +45,17 @@
         android:gravity="center"
         android:text="MapBox" />
 
+    <Button
+        android:id="@+id/map_frag_btn"
+        android:layout_below="@id/map_box_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="MapFrag" />
+
+
     <FrameLayout
         android:id="@+id/map_fragment"
         android:layout_width="match_parent"
