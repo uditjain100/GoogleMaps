@@ -1,19 +1,23 @@
 package udit.programmer.co.mapswork
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMapOptions
-import com.mapbox.mapboxsdk.maps.Style
-import kotlinx.android.synthetic.main.activity_location.*
-import kotlinx.android.synthetic.main.activity_map_box.*
+import com.mapbox.mapboxsdk.maps.*
+import com.mapbox.mapboxsdk.style.layers.HillshadeLayer
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory
+import com.mapbox.mapboxsdk.style.sources.RasterDemSource
 
-class MapBoxActivity : AppCompatActivity() {
+class MapBoxActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
+    private val LAYER_ID = "hillshade-layer"
+    private val SOURCE_ID = "hillshade-source"
+    private val SOURCE_URL = "mapbox://mapbox.terrain-rgb"
+    private val HILLSHADE_HIGHLIGHT_COLOR = "#008924"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,12 +30,24 @@ class MapBoxActivity : AppCompatActivity() {
 
         mapView = MapView(this, options)
         mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync {
-            it.setStyle(Style.OUTDOORS) {
-
-            }
-        }
+        mapView.getMapAsync(this)
         setContentView(mapView)
+    }
+
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        mapboxMap.setStyle(Style.OUTDOORS) {
+            it.addSource(RasterDemSource(SOURCE_ID, SOURCE_URL))
+            val hillShadeLayer = HillshadeLayer(LAYER_ID, SOURCE_ID)
+                .withProperties(
+                    PropertyFactory.hillshadeHighlightColor(
+                        Color.parseColor(
+                            HILLSHADE_HIGHLIGHT_COLOR
+                        )
+                    ),
+                    PropertyFactory.hillshadeShadowColor(Color.BLACK)
+                )
+            it.addLayerBelow(hillShadeLayer, "aerialway")
+        }
     }
 
     override fun onStart() {
@@ -62,6 +78,11 @@ class MapBoxActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
     }
 
 }
