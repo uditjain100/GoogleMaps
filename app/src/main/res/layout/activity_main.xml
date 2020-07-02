@@ -65,6 +65,26 @@
         android:gravity="center"
         android:text="Search" />
 
+    <Button
+        android:id="@+id/place_pick_btn"
+        android:layout_below="@id/map_frag_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="Pick" />
+
+    <Button
+        android:id="@+id/search_pick_btn"
+        android:layout_below="@id/place_pick_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="Search  Pick" />
+
     <FrameLayout
         android:id="@+id/map_fragment"
         android:layout_width="match_parent"

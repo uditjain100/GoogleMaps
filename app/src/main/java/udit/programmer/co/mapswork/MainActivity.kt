@@ -10,6 +10,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        search_pick_btn.setOnClickListener {
+            startActivity(Intent(this, SearchPickActivity::class.java))
+        }
+
+        place_pick_btn.setOnClickListener {
+            startActivity(Intent(this, PlacePickerActivity::class.java))
+        }
+
         search_btn.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
