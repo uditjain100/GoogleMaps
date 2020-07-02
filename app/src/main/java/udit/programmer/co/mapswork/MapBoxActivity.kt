@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.PolygonOptions
+import com.mapbox.mapboxsdk.annotations.PolylineOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.*
@@ -22,8 +24,9 @@ class MapBoxActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(
-            this,
-            "pk.eyJ1IjoidWRpdGphaW4xMDAiLCJhIjoiY2tjM21odzJoMTN6YTJybGZ3Y21hNmUybyJ9.j_BjCEd8MUiFY_A9hA-phQ"
+            this, getString(
+                R.string.mapbox_access_token
+            )
         )
         val options = MapboxMapOptions.createFromAttributes(this, null)
             .camera(CameraPosition.Builder().target(LatLng(43.7383, 7.7094)).zoom(5.00).build())
@@ -48,6 +51,50 @@ class MapBoxActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             it.addLayerBelow(hillShadeLayer, "aerialway")
         }
+        
+        mapboxMap.addMarker(
+            com.mapbox.mapboxsdk.annotations.MarkerOptions().position(LatLng(48.85819, 2.29458))
+                .title("Eiffel Tower")
+        )
+        mapboxMap.addMarker(
+            com.mapbox.mapboxsdk.annotations.MarkerOptions().position(LatLng(43.7383, 7.7094))
+                .title("New")
+        )
+        mapboxMap.addMarker(
+            com.mapbox.mapboxsdk.annotations.MarkerOptions().position(LatLng(45.522585, -122.685699))
+                .title("New")
+        )
+
+        mapboxMap.addPolyline(
+            PolylineOptions()
+                .add(LatLng(43.7383, 7.7094))
+                .add(LatLng(48.85819, 2.29458))
+                .color(Color.parseColor("#3bb2d0"))
+                .width(2f)
+        )
+
+        val polygonLatLngList = mutableListOf<LatLng>();
+
+        polygonLatLngList.add(LatLng(45.522585, -122.685699));
+        polygonLatLngList.add(LatLng(45.534611, -122.708873));
+        polygonLatLngList.add(LatLng(45.530883, -122.678833));
+        polygonLatLngList.add(LatLng(45.547115, -122.667503));
+        polygonLatLngList.add(LatLng(45.530643, -122.660121));
+        polygonLatLngList.add(LatLng(45.533529, -122.636260));
+        polygonLatLngList.add(LatLng(45.521743, -122.659091));
+        polygonLatLngList.add(LatLng(45.510677, -122.648792));
+        polygonLatLngList.add(LatLng(45.515008, -122.664070));
+        polygonLatLngList.add(LatLng(45.502496, -122.669048));
+        polygonLatLngList.add(LatLng(45.515369, -122.678489));
+        polygonLatLngList.add(LatLng(45.506346, -122.702007));
+        polygonLatLngList.add(LatLng(45.522585, -122.685699));
+
+        mapboxMap.addPolygon(
+            PolygonOptions()
+                .addAll(polygonLatLngList)
+                .fillColor(Color.parseColor("#3bb2d0"))
+        )
+
     }
 
     override fun onStart() {
