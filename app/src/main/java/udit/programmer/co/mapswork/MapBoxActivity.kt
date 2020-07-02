@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.style.layers.HillshadeLayer
 import com.mapbox.mapboxsdk.style.layers.Property
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.sources.RasterDemSource
+import kotlinx.android.synthetic.main.activity_location.*
 
 class MapBoxActivity : AppCompatActivity(), OnMapReadyCallback {
 

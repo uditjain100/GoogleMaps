@@ -55,6 +55,15 @@
         android:gravity="center"
         android:text="MapFrag" />
 
+    <Button
+        android:id="@+id/search_btn"
+        android:layout_below="@id/map_frag_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="Search" />
 
     <FrameLayout
         android:id="@+id/map_fragment"

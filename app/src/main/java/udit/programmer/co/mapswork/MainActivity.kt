@@ -10,6 +10,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        search_btn.setOnClickListener {
+            startActivity(Intent(this, SearchActivity::class.java))
+        }
+
         map_frag_btn.setOnClickListener {
             startActivity(Intent(this, MapFragActivity::class.java))
         }
