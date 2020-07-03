@@ -6,15 +6,24 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.JsonObject
 import com.mapbox.android.core.location.*
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -27,9 +36,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions
-import com.mapbox.mapboxsdk.plugins.places.picker.PlacePicker
-import com.mapbox.mapboxsdk.plugins.places.picker.model.PlacePickerOptions
 import com.mapbox.mapboxsdk.plugins.traffic.TrafficPlugin
+import com.mapbox.mapboxsdk.style.layers.Layer
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -40,6 +48,8 @@ import java.lang.ref.WeakReference
 
 class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
 
+    private lateinit var firebaseDatabase: DatabaseReference
+
     private lateinit var mapView: MapView
     var mapboxMap: MapboxMap? = null
     private lateinit var home: CarmenFeature
@@ -47,7 +57,10 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private val geojsonSourceLayerId = "geojsonSourceLayerId"
     private val symbolIconId = "symbolIconId"
     private val REQUEST_CODE_AUTOCOMPLETE = 1
-    private val REQUEST_CODE = 5678
+
+    private val DROPPED_MARKER_LAYER_ID = "DROPPED_MARKER_LAYER_ID"
+    private var hoveringMarker: ImageView? = null
+    private var droppedMarkerLayer: Layer? = null
 
     var lat: Double = 0.0
     var lng: Double = 0.0
@@ -70,9 +83,21 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
-        fab_location_pick_btn.setOnClickListener {
+        firebaseDatabase = FirebaseDatabase.getInstance().getReference("LatLng")
+
+        fab_done_btn.setOnClickListener {
             locationEngine!!.removeLocationUpdates(callback)
-            gotoPickerActivity()
+            val map = mutableMapOf<String, Double>()
+            map["Latitude"] = lat
+            map["Longitude"] = lng
+            firebaseDatabase.child("000")
+                .setValue(map).addOnSuccessListener {
+                    Toast.makeText(this, "Location Stored", Toast.LENGTH_LONG).show()
+                    Thread.sleep(2000)
+                    onBackPressed()
+                }.addOnFailureListener {
+                    Toast.makeText(this, "FAILED : $it", Toast.LENGTH_LONG).show()
+                }
         }
 
         fab_navigate_pick_btn.setOnClickListener {
@@ -83,23 +108,90 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            TrafficPlugin(mapView, mapboxMap, it).setVisibility(true)
+        mapboxMap.setStyle(Style.OUTDOORS) { style ->
+            TrafficPlugin(mapView, mapboxMap, style).setVisibility(true)
 
-            enableLocationComponent(it)
+            enableLocationComponent(style)
 
             initSearchFab()
             addUserLocation()
 
             val drawable = ResourcesCompat.getDrawable(
-                resources, R.drawable.ic_baseline_contact_phone_24, null
+                resources, R.mipmap.location_green, null
             )
             val bitmap = BitmapUtils.getBitmapFromDrawable(drawable)
-            it.addImage(symbolIconId, bitmap!!)
+            style.addImage(symbolIconId, bitmap!!)
 
-            setUpSource(it)
-            setUpLayer(it)
+            setUpSource(style)
+            setUpLayer(style)
+
+            hoveringMarker = ImageView(this)
+            hoveringMarker!!.setImageResource(R.mipmap.location)
+            val params = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER
+            )
+            hoveringMarker!!.layoutParams = params
+            mapView!!.addView(hoveringMarker)
+
+            initDroppedMarker(style)
+
+            fab_location_pick_btn.setOnClickListener {
+                locationEngine!!.removeLocationUpdates(callback)
+                if (hoveringMarker!!.visibility == View.VISIBLE) {
+                    val mapTargetLatLng = mapboxMap.cameraPosition.target;
+
+                    hoveringMarker!!.visibility = View.INVISIBLE;
+                    fab_location_pick_btn.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.BlueViolet)
+                    );
+                    fab_location_pick_btn.text = "Cancel";
+                    Toast.makeText(this, "Selected :)", Toast.LENGTH_LONG).show()
+                    fab_done_btn.isClickable = true
+
+                    if (style.getLayer(DROPPED_MARKER_LAYER_ID) != null) {
+                        val source = style.getSourceAs<GeoJsonSource>("dropped-marker-source-id");
+                        source?.setGeoJson(
+                            Point.fromLngLat(
+                                mapTargetLatLng.longitude,
+                                mapTargetLatLng.latitude
+                            )
+                        )
+                        droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID)
+                    }
+                } else {
+                    fab_location_pick_btn.setBackgroundColor(
+                        ContextCompat.getColor(this, R.color.DodgerBlue)
+                    )
+                    fab_location_pick_btn.text = "PICK";
+                    hoveringMarker!!.visibility = View.VISIBLE;
+                    droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID);
+                    fab_done_btn.isClickable = true
+                }
+            }
+
         }
+    }
+
+    private fun initDroppedMarker(it: Style) {
+
+        val drawable = ResourcesCompat.getDrawable(
+            resources, R.mipmap.location_blue, null
+        )
+        val bitmap = BitmapUtils.getBitmapFromDrawable(drawable)
+        it.addImage("dropped-icon-image", bitmap!!)
+
+        it.addSource(GeoJsonSource("dropped-marker-source-id"))
+        it.addLayer(
+            SymbolLayer(
+                DROPPED_MARKER_LAYER_ID,
+                "dropped-marker-source-id"
+            ).withProperties(
+                PropertyFactory.iconImage("dropped-icon-image"),
+                PropertyFactory.iconAllowOverlap(true),
+                PropertyFactory.iconIgnorePlacement(true)
+            )
+        )
     }
 
     @SuppressLint("LogNotTimber", "MissingPermission")
@@ -181,27 +273,6 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
             }
 
         }
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val carmenFeature = PlacePicker.getPlace(data)
-            Toast.makeText(this, "Location Selected", Toast.LENGTH_LONG).show()
-            locationEngine!!.requestLocationUpdates(request, callback, mainLooper)
-            if (carmenFeature != null) {
-                selected_location_info_tv.text = String.format("qwertyu", carmenFeature.toJson())
-            }
-        }
-    }
-
-    private fun gotoPickerActivity() {
-        startActivityForResult(
-            PlacePicker.IntentBuilder()
-                .accessToken(getString(R.string.mapbox_access_token))
-                .placeOptions(
-                    PlacePickerOptions.builder().statingCameraPosition(
-                        CameraPosition.Builder().target(LatLng(lat, lng)).zoom(16.0)
-                            .build()
-                    ).build()
-                ).build(this), REQUEST_CODE
-        )
     }
 
     private fun setUpLayer(it: Style) {

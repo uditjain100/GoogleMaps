@@ -24,23 +24,41 @@
         app:srcCompat="@android:drawable/ic_search_category_default" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_location_pick_btn"
+        android:id="@+id/fab_done_btn"
+        android:clickable="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|bottom"
-        android:layout_margin="16dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="156dp"
+        android:layout_marginRight="16dp"
         android:tint="@android:color/white"
         app:backgroundTint="@color/LightBlue"
-        app:srcCompat="@drawable/ic_baseline_not_listed_location_24" />
+        app:srcCompat="@drawable/ic_baseline_done_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/fab_location_pick_btn"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_marginLeft="16dp"
+        app:cornerRadius="20dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/DodgerBlue"
+        android:text="PICK"
+        android:textColor="@color/White"
+        android:textSize="20dp"
+        app:rippleColor="@color/LightBlue" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_navigate_pick_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="86dp"
         android:tint="@android:color/white"
         app:backgroundTint="@color/LightBlue"
+        app:rippleColor="@color/LightBlue"
         app:srcCompat="@drawable/ic_baseline_gps_fixed_24" />
 
     <com.google.android.material.textview.MaterialTextView

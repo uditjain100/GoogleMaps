@@ -71,7 +71,7 @@ class PlacePickerActivity : AppCompatActivity(), OnMapReadyCallback, Permissions
             hoveringMarker!!.layoutParams = params
             mapView!!.addView(hoveringMarker)
 
-//            initDroppedMarker(style)
+            initDroppedMarker(style)
 
             select_location_button.setOnClickListener {
                 if (hoveringMarker!!.visibility == View.VISIBLE) {
@@ -89,74 +89,25 @@ class PlacePickerActivity : AppCompatActivity(), OnMapReadyCallback, Permissions
                         Toast.LENGTH_LONG
                     ).show()
 
-//                    if (style.getLayer(DROPPED_MARKER_LAYER_ID) != null) {
-//                        val source = style.getSourceAs<GeoJsonSource>("dropped-marker-source-id");
-//                        source?.setGeoJson(
-//                            Point.fromLngLat(
-//                                mapTargetLatLng.longitude,
-//                                mapTargetLatLng.latitude
-//                            )
-//                        )
-//                        droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID)
-//                    }
-//                    reverseGeoCode(
-//                        Point.fromLngLat(mapTargetLatLng.latitude, mapTargetLatLng.longitude)
-//                    )
+                    if (style.getLayer(DROPPED_MARKER_LAYER_ID) != null) {
+                        val source = style.getSourceAs<GeoJsonSource>("dropped-marker-source-id");
+                        source?.setGeoJson(
+                            Point.fromLngLat(
+                                mapTargetLatLng.longitude,
+                                mapTargetLatLng.latitude
+                            )
+                        )
+                        droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID)
+                    }
                 } else {
                     select_location_button.setBackgroundColor(
                         ContextCompat.getColor(this, R.color.Blue)
                     )
                     select_location_button.text = "Select another Location";
                     hoveringMarker!!.visibility = View.VISIBLE;
-//                    droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID);
+                    droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID);
                 }
             }
-        }
-    }
-
-    private fun reverseGeoCode(point: Point) {
-        try {
-            var client = MapboxGeocoding.builder()
-                .accessToken(getString(R.string.mapbox_access_token))
-                .query(Point.fromLngLat(point.longitude(), point.latitude()))
-                .geocodingTypes(GeocodingCriteria.TYPE_ADDRESS)
-                .build()
-
-            client.enqueueCall(object : Callback<GeocodingResponse> {
-                override fun onFailure(call: Call<GeocodingResponse>, t: Throwable) {
-                    Timber.e("Geocoding Failure: %s", t.message)
-                }
-
-                override fun onResponse(
-                    call: Call<GeocodingResponse>,
-                    response: Response<GeocodingResponse>
-                ) {
-                    if (response.body() != null) {
-                        var result = response.body()!!.features()
-                        if (result.size > 0) {
-                            var feature = result[0]
-                            mapboxMap!!.getStyle() {
-                                if (it.getLayer(DROPPED_MARKER_LAYER_ID) != null) {
-                                    Toast.makeText(
-                                        this@PlacePickerActivity,
-                                        "location_picker_place_name_result ${feature.placeName()}"
-                                        , Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        }
-                    } else {
-                        Toast.makeText(
-                            this@PlacePickerActivity,
-                            "location_picker_dropped_marker_snippet_no_results",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            })
-        } catch (e: ServicesException) {
-            Timber.e("Error geocoding: %s", e.toString());
-            e.printStackTrace()
         }
     }
 
@@ -169,16 +120,16 @@ class PlacePickerActivity : AppCompatActivity(), OnMapReadyCallback, Permissions
         it.addImage("dropped-icon-image", bitmap!!)
 
         it.addSource(GeoJsonSource("dropped-marker-source-id"))
-//        it.addLayer(
-//            SymbolLayer(
-//                DROPPED_MARKER_LAYER_ID,
-//                "dropped-marker-source-id"
-//            ).withProperties(
-//                PropertyFactory.iconImage("dropped-icon-image"),
-//                PropertyFactory.iconAllowOverlap(true),
-//                PropertyFactory.iconIgnorePlacement(true)
-//            )
-//        )
+        it.addLayer(
+            SymbolLayer(
+                DROPPED_MARKER_LAYER_ID,
+                "dropped-marker-source-id"
+            ).withProperties(
+                PropertyFactory.iconImage("dropped-icon-image"),
+                PropertyFactory.iconAllowOverlap(true),
+                PropertyFactory.iconIgnorePlacement(true)
+            )
+        )
     }
 
     @SuppressLint("LogNotTimber", "MissingPermission")
