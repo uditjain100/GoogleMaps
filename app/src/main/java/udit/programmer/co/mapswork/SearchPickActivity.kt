@@ -1,16 +1,13 @@
 package udit.programmer.co.mapswork
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.gson.JsonObject
 import com.mapbox.android.core.location.*
