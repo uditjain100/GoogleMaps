@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/nav_blank"
-        android:name="udit.programmer.co.mapswork.ui.BlankFragment"
+        android:name="udit.programmer.co.mapswork.BlankFragment"
         android:label="Blank"
         tools:layout="@layout/fragment_blank" />
 

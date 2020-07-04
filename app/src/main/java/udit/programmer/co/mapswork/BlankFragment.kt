@@ -1,11 +1,10 @@
-package udit.programmer.co.mapswork.ui
+package udit.programmer.co.mapswork
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import udit.programmer.co.mapswork.R
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

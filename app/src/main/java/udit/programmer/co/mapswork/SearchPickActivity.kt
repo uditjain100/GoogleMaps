@@ -21,6 +21,7 @@ import com.google.gson.JsonObject
 import com.mapbox.android.core.location.*
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.api.directions.v5.models.DirectionsResponse
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
@@ -42,7 +43,13 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute
+import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
+import kotlinx.android.synthetic.main.activity_location.*
 import kotlinx.android.synthetic.main.activity_search_pick.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Exception
 import java.lang.ref.WeakReference
 
@@ -62,6 +69,9 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
     private var hoveringMarker: ImageView? = null
     private var droppedMarkerLayer: Layer? = null
 
+    var currentLat = 0.0
+    var currentLng = 0.0
+
     var lat: Double = 0.0
     var lng: Double = 0.0
 
@@ -73,6 +83,8 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
     private lateinit var request: LocationEngineRequest
     private var callback = SearchPickActivityLocationCallback(this)
+
+    private var navigationMapRoute: NavigationMapRoute? = null
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,6 +161,17 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                     Toast.makeText(this, "Selected :)", Toast.LENGTH_LONG).show()
                     fab_done_btn.isClickable = true
 
+                    lat = mapTargetLatLng.latitude
+                    lng = mapTargetLatLng.longitude
+
+//                    if (lat == 0.0 || lng == 0.0 || currentLat == 0.0 || currentLng == 0.0) {
+//                        Toast.makeText(this, "Select Destination", Toast.LENGTH_LONG).show()
+//                    } else {
+//                        var origin = Point.fromLngLat(currentLat, currentLng)
+//                        var dest = Point.fromLngLat(lat, lng)
+//                        getRoute(origin, dest)
+//                    }
+
                     if (style.getLayer(DROPPED_MARKER_LAYER_ID) != null) {
                         val source = style.getSourceAs<GeoJsonSource>("dropped-marker-source-id");
                         source?.setGeoJson(
@@ -159,6 +182,7 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
                         )
                         droppedMarkerLayer = style.getLayer(DROPPED_MARKER_LAYER_ID)
                     }
+
                 } else {
                     fab_location_pick_btn.setBackgroundColor(
                         ContextCompat.getColor(this, R.color.DodgerBlue)
@@ -172,6 +196,31 @@ class SearchPickActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsL
 
         }
     }
+
+//    private fun getRoute(origin: Point, dest: Point) {
+//        NavigationRoute.builder(this).accessToken(Mapbox.getAccessToken()!!).origin(origin)
+//            .destination(dest).build().getRoute(object : Callback<DirectionsResponse> {
+//                override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {}
+//                override fun onResponse(
+//                    call: Call<DirectionsResponse>,
+//                    response: Response<DirectionsResponse>
+//                ) {
+//                    if (response.body() == null || response.body()!!.routes().size == 0) {
+//                        Toast.makeText(
+//                            this@SearchPickActivity, "No routes found", Toast.LENGTH_LONG
+//                        ).show()
+//                        return
+//                    }
+//                    val route = response.body()!!.routes()[0]
+//                    if (navigationMapRoute != null) {
+//                        navigationMapRoute!!.removeRoute()
+//                    } else {
+//                        navigationMapRoute = NavigationMapRoute(null, mapView, mapboxMap!!)
+//                    }
+//                    navigationMapRoute!!.addRoute(route)
+//                }
+//            })
+//    }
 
     private fun initDroppedMarker(it: Style) {
 
@@ -373,10 +422,10 @@ class SearchPickActivityLocationCallback(activity: SearchPickActivity?) :
         val activity: SearchPickActivity = activityWeakReference!!.get()!!
         if (activity != null) {
             val location = result!!.lastLocation ?: return
-            activity.lat = location.latitude
-            activity.lng = location.longitude
+            activity.currentLat = location.latitude
+            activity.currentLng = location.longitude
             Toast.makeText(
-                activity, "lat : ${activity.lat} , lng : ${activity.lng}",
+                activity, "lat : ${activity.currentLat} , lng : ${activity.currentLng}",
                 Toast.LENGTH_SHORT
             ).show()
             if (activity.mapboxMap != null && result.lastLocation != null) {
@@ -385,7 +434,7 @@ class SearchPickActivityLocationCallback(activity: SearchPickActivity?) :
                 activity.mapboxMap!!.animateCamera(
                     com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(
                         CameraPosition.Builder()
-                            .target(LatLng(activity.lat, activity.lng)).zoom(14.0)
+                            .target(LatLng(activity.currentLat, activity.currentLng)).zoom(14.0)
                             .build()
                     ), 4000
                 )
